@@ -140,6 +140,9 @@ class TypeParameterResolverTest {
     assertEquals(Calculator.class, paramType.getRawType());
     assertEquals(1, paramType.getActualTypeArguments().length);
     assertTrue(paramType.getActualTypeArguments()[0] instanceof WildcardType);
+    WildcardType wildcardType=(WildcardType)paramType.getActualTypeArguments()[0];
+    assertEquals(1,wildcardType.getUpperBounds().length);
+    assertEquals(Object.class,wildcardType.getUpperBounds()[0]);
   }
 
   @Test
@@ -174,6 +177,20 @@ class TypeParameterResolverTest {
     ParameterizedType paramTypeInner = (ParameterizedType) paramTypeOuter.getActualTypeArguments()[0];
     assertEquals(Calculator.class, paramTypeInner.getRawType());
     assertEquals(Date.class, paramTypeInner.getActualTypeArguments()[0]);
+  }
+
+  @Test
+  void testReturn_Lv0CustomClassList() throws Exception {
+    Class<?> clazz = Level0Mapper.class;
+    Method method = clazz.getMethod("selectCalculatorList");
+    Type result = TypeParameterResolver.resolveReturnType(method, clazz);
+    assertTrue(result instanceof ParameterizedType);
+    ParameterizedType paramTypeOuter = (ParameterizedType) result;
+    assertEquals(List.class, paramTypeOuter.getRawType());
+    assertEquals(1, paramTypeOuter.getActualTypeArguments().length);
+    ParameterizedType paramTypeInner = (ParameterizedType) paramTypeOuter.getActualTypeArguments()[0];
+    assertEquals(Calculator.class, paramTypeInner.getRawType());
+    assertEquals(Object.class, paramTypeInner.getActualTypeArguments()[0]);
   }
 
   @Test
@@ -213,6 +230,17 @@ class TypeParameterResolverTest {
     Class<?> resultClass = (Class<?>) result;
     assertTrue(resultClass.isArray());
     assertEquals(String.class, resultClass.getComponentType());
+  }
+
+  @Test
+  void testReturn_Lv0Array() throws Exception {
+    Class<?> clazz = Level0Mapper.class;
+    Method method = clazz.getMethod("selectArray", List[].class);
+    Type result = TypeParameterResolver.resolveReturnType(method, clazz);
+    assertTrue(result instanceof Class);
+    Class<?> resultClass = (Class<?>) result;
+    assertTrue(resultClass.isArray());
+    assertEquals(Object.class, resultClass.getComponentType());
   }
 
   @Test
