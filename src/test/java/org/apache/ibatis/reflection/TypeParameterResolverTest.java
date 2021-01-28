@@ -464,5 +464,6 @@ class TypeParameterResolverTest {
     assertEquals(Integer.class, TypeParameterResolver.resolveReturnType(method, clazz));
     Field field = A.class.getDeclaredField("id");
     assertEquals(Integer.class, TypeParameterResolver.resolveFieldType(field, clazz));
+    assertEquals(Object.class, TypeParameterResolver.resolveFieldType(field, A.class));
   }
 }
