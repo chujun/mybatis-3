@@ -359,6 +359,14 @@ class TypeParameterResolverTest {
   }
 
   @Test
+  void testParam_Calculator() throws Exception {
+    Class<?> clazz = Calculator.class;
+    Method method = clazz.getMethod("setId", Object.class);
+    Type[] result = TypeParameterResolver.resolveParamTypes(method, clazz);
+    assertEquals(Object.class, result[0]);
+  }
+
+  @Test
   void testReturn_Anonymous() throws Exception {
     Calculator<?> instance = new Calculator<Integer>();
     Class<?> clazz = instance.getClass();
