@@ -25,7 +25,7 @@ import java.util.Iterator;
  * @author Clinton Begin
  */
 public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
-  //以"student[sld].name"为例
+  //以"student[sld].name"为例,各个字段解析结果
   //student
   private String name;
   //student[sld]

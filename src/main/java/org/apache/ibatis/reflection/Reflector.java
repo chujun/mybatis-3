@@ -64,7 +64,7 @@ public class Reflector {
    */
   private final Map<String, Invoker> setMethods = new HashMap<>();
   /**
-   * get方法map，key为属性名，value为对应的get方法
+   * get方法map，key为属性名，value为对应的get方法，可能是GetFieldInvoker，也可能是MethodInvoker实现类
    */
   private final Map<String, Invoker> getMethods = new HashMap<>();
   /**
