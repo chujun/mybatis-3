@@ -28,11 +28,11 @@ public class PropertyTokenizer implements Iterator<PropertyTokenizer> {
   //以"student[sld].name"为例,各个字段解析结果
   //student
   private String name;
-  //student[sld]
+  //student[sld],取"."之前的字符串,没有就取全部
   private final String indexedName;
-  //sld
+  //sld,存在"["就有值,String类型有可能是list[0],也可能是map["key"]
   private String index;
-  //name
+  //name，存在"."就有值
   private final String children;
 
   public PropertyTokenizer(String fullname) {

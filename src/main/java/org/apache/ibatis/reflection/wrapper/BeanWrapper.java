@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2017 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2017 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.reflection.wrapper;
 
@@ -40,16 +40,30 @@ public class BeanWrapper extends BaseWrapper {
     this.metaClass = MetaClass.forClass(object.getClass(), metaObject.getReflectorFactory());
   }
 
+  /**
+   * 从该方法的调用处看,该方法只有children没有值是才会调用该get方法，
+   * 所以这儿的prop的name不可能是"a.b"形式
+   *
+   * 竟然发现了源码可优化点,有点小兴奋
+   * 感觉这儿可以改进一波,方法作用不太明确，因为该方法没有处理prop存在children时的场景，不够内聚，
+   * 可优化点:把调用测的代码(MataObject.getValue)移动到这儿更合理一点,就像getSetterType方法一样
+   */
   @Override
   public Object get(PropertyTokenizer prop) {
+
     if (prop.getIndex() != null) {
+      //处理集合元素属性
       Object collection = resolveCollection(prop, object);
       return getCollectionValue(prop, collection);
     } else {
+      //处理普通属性
       return getBeanProperty(prop, object);
     }
   }
 
+  /**
+   * 与get方法有相同的源码可优化点问题
+   */
   @Override
   public void set(PropertyTokenizer prop, Object value) {
     if (prop.getIndex() != null) {
@@ -146,10 +160,13 @@ public class BeanWrapper extends BaseWrapper {
   @Override
   public MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory) {
     MetaObject metaValue;
+    //1.获取set方法类型
     Class<?> type = getSetterType(prop.getName());
     try {
+      //2.根据类型创建对象
       Object newObject = objectFactory.create(type);
       metaValue = MetaObject.forObject(newObject, metaObject.getObjectFactory(), metaObject.getObjectWrapperFactory(), metaObject.getReflectorFactory());
+      //3.设置属性值
       set(prop, newObject);
     } catch (Exception e) {
       throw new ReflectionException("Cannot set value of property '" + name + "' because '" + name + "' is null and cannot be instantiated on instance of " + type.getName() + ". Cause:" + e.toString(), e);

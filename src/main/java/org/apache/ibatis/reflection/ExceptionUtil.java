@@ -27,6 +27,10 @@ public class ExceptionUtil {
     // Prevent Instantiation
   }
 
+  /**
+   * 剥离出jdk反射异常类调用错误，获取原始错误
+   * 这里提供了一种处理问题的思路，绕过反射类抛出的异常，获取更深层次的异常
+   */
   public static Throwable unwrapThrowable(Throwable wrapped) {
     Throwable unwrapped = wrapped;
     while (true) {

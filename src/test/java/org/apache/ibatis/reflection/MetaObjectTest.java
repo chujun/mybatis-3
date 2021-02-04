@@ -45,7 +45,9 @@ class MetaObjectTest {
     RichType rich = new RichType();
     MetaObject meta = SystemMetaObject.forObject(rich);
     meta.setValue("richType.richField", "foo");
+    meta.setValue("richType.richProperty", "richProperty");
     assertEquals("foo", meta.getValue("richType.richField"));
+    assertEquals("richProperty", meta.getValue("richType.richProperty"));
   }
 
   @Test

@@ -132,6 +132,7 @@ public class MetaObject {
           // don't instantiate child path if value is null
           return;
         } else {
+          //等于null时才初始化对象，否则直接赋值
           metaValue = objectWrapper.instantiatePropertyValue(name, prop, objectFactory);
         }
       }
