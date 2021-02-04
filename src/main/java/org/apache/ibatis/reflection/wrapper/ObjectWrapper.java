@@ -22,34 +22,73 @@ import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
+ * 对象包装器接口
  * @author Clinton Begin
  */
 public interface ObjectWrapper {
-
+  /**
+   * 获得被包装对象某个属性的值
+   */
   Object get(PropertyTokenizer prop);
 
+  /**
+   * 设置被包装对象某个属性的值
+   */
   void set(PropertyTokenizer prop, Object value);
 
+  /**
+   * 找到对应的属性名称
+   */
   String findProperty(String name, boolean useCamelCaseMapping);
 
+  /**
+   * 获得所有属性get方法名称
+   */
   String[] getGetterNames();
 
+  /**
+   * 获得所有属性set方法名称
+   */
   String[] getSetterNames();
 
+  /**
+   * 获得指定属性set方法类型
+   */
   Class<?> getSetterType(String name);
 
+  /**
+   * 获得指定属性get方法类型
+   */
   Class<?> getGetterType(String name);
 
+  /**
+   * 判断某个属性是否有对应的set方法
+   */
   boolean hasSetter(String name);
 
+  /**
+   * 判断某个属性是否有对应的get方法
+   */
   boolean hasGetter(String name);
 
+  /**
+   * 实例化某个属性的值
+   */
   MetaObject instantiatePropertyValue(String name, PropertyTokenizer prop, ObjectFactory objectFactory);
 
+  /**
+   * 判断被包装对象是否是集合
+   */
   boolean isCollection();
 
+  /**
+   * 被包装对象添加集合元素
+   */
   void add(Object element);
 
+  /**
+   * 被包装对象添加多个集合元素
+   */
   <E> void addAll(List<E> element);
 
 }
