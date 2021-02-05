@@ -28,6 +28,9 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+/**
+ * 参考@Param注解功能的说明
+ */
 public class ParamNameResolver {
 
   private static final String GENERIC_NAME_PREFIX = "param";
@@ -38,6 +41,8 @@ public class ParamNameResolver {
    * The name is obtained from {@link Param} if specified. When {@link Param} is not specified,
    * the parameter index is used. Note that this index could be different from the actual index
    * when the method has special parameters (i.e. {@link RowBounds} or {@link ResultHandler}).
+   *
+   * 如下结果是在不考虑config.isUseActualParamName()开启的情况下得到的,开启的话就会尝试拿到参数名称了
    * </p>
    * <ul>
    * <li>aMethod(@Param("M") int a, @Param("N") int b) -&gt; {{0, "M"}, {1, "N"}}</li>
@@ -100,6 +105,8 @@ public class ParamNameResolver {
   }
 
   /**
+   * 调试追踪法入口--->
+   * SubstitutionInAnnotsTest#testSubstitutionWithAnnotsParamAnnot
    * <p>
    * A single non-special parameter is returned without a name.
    * Multiple parameters are named using the naming rule.
