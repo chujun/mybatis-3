@@ -202,6 +202,10 @@ public class MapperMethod {
     return result;
   }
 
+  /**
+   * 相对于HashMap,强化了get方法，key必须存在，否则抛出BindingException异常
+   * @param <V>
+   */
   public static class ParamMap<V> extends HashMap<String, V> {
 
     private static final long serialVersionUID = -2212268410512043556L;
