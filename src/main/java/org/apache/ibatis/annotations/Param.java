@@ -22,6 +22,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 参考注解使用处
+ * ParamNameResolver类
  * @author Clinton Begin
  */
 @Documented
