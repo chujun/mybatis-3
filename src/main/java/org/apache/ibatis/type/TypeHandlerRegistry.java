@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.type;
 
@@ -48,18 +48,27 @@ import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.io.Resources;
 
 /**
+ * 类型处理器注册表
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
 public final class TypeHandlerRegistry {
+  //JDBC类型与对应类型处理器的映射
+  private final Map<JdbcType, TypeHandler<?>> jdbcTypeHandlerMap = new EnumMap<>(JdbcType.class);
 
-  private final Map<JdbcType, TypeHandler<?>>  jdbcTypeHandlerMap = new EnumMap<>(JdbcType.class);
+  //Java类型与Map<JdbcType,TypeHandler<?>>的映射
   private final Map<Type, Map<JdbcType, TypeHandler<?>>> typeHandlerMap = new ConcurrentHashMap<>();
+
+  //未知类型的处理器
   private final TypeHandler<Object> unknownTypeHandler = new UnknownTypeHandler(this);
+
+  //键为typeHandler.getClass(),值为typeHandler。里面存储了所有的类型处理器
   private final Map<Class<?>, TypeHandler<?>> allTypeHandlersMap = new HashMap<>();
 
+  //特殊标志对象,空的Map<JdbcType,TypeHandler<?>>，表示该Java类型没有对应的Map<JdbcType,TypeHandler<?>>
   private static final Map<JdbcType, TypeHandler<?>> NULL_TYPE_HANDLER_MAP = Collections.emptyMap();
 
+  //默认的枚举类型处理器
   private Class<? extends TypeHandler> defaultEnumTypeHandler = EnumTypeHandler.class;
 
   public TypeHandlerRegistry() {
@@ -213,16 +222,28 @@ public final class TypeHandlerRegistry {
     return getTypeHandler(javaTypeReference.getRawType(), jdbcType);
   }
 
+  /**
+   * 核心查找方法，找出一个类型处理器
+   * @param type Java类型
+   * @param jdbcType JDBC类型
+   * @param <T> 类型处理器的目标类型
+   * @return 类型处理器
+   */
   @SuppressWarnings("unchecked")
   private <T> TypeHandler<T> getTypeHandler(Type type, JdbcType jdbcType) {
     if (ParamMap.class.equals(type)) {
+      //ParamMap，不是单一的Java类型
       return null;
     }
+    //先根据Java类型找到对应的jdbcHandlerMap
     Map<JdbcType, TypeHandler<?>> jdbcHandlerMap = getJdbcHandlerMap(type);
     TypeHandler<?> handler = null;
     if (jdbcHandlerMap != null) {
+      //根据JDBC类型找寻对应的处理器
       handler = jdbcHandlerMap.get(jdbcType);
       if (handler == null) {
+        //使用null作为建进行一次找寻，通过本类源码可知当前jdbcHandlerMap可能是EnumMap，也可能是HashMap
+        //EnumMap不允许键为null，因此总返回null.HashMap允许键返回null,这并不是一次无用功
         handler = jdbcHandlerMap.get(null);
       }
       if (handler == null) {
@@ -230,6 +251,7 @@ public final class TypeHandlerRegistry {
         handler = pickSoleHandler(jdbcHandlerMap);
       }
     }
+    //返回找到的类型处理器
     // type drives generics here
     return (TypeHandler<T>) handler;
   }
@@ -242,13 +264,16 @@ public final class TypeHandlerRegistry {
     if (jdbcHandlerMap == null && type instanceof Class) {
       Class<?> clazz = (Class<?>) type;
       if (Enum.class.isAssignableFrom(clazz)) {
+        //处理枚举类型
         Class<?> enumClass = clazz.isAnonymousClass() ? clazz.getSuperclass() : clazz;
         jdbcHandlerMap = getJdbcHandlerMapForEnumInterfaces(enumClass, enumClass);
         if (jdbcHandlerMap == null) {
+          //动态注册枚举类型处理器
           register(enumClass, getInstance(enumClass, defaultEnumTypeHandler));
           return typeHandlerMap.get(enumClass);
         }
       } else {
+        //处理普通类型
         jdbcHandlerMap = getJdbcHandlerMapForSuperclass(clazz);
       }
     }
@@ -276,7 +301,7 @@ public final class TypeHandlerRegistry {
   }
 
   private Map<JdbcType, TypeHandler<?>> getJdbcHandlerMapForSuperclass(Class<?> clazz) {
-    Class<?> superclass =  clazz.getSuperclass();
+    Class<?> superclass = clazz.getSuperclass();
     if (superclass == null || Object.class.equals(superclass)) {
       return null;
     }
@@ -288,6 +313,9 @@ public final class TypeHandlerRegistry {
     }
   }
 
+  /**
+   * 选择唯一的jdbc类型处理器
+   */
   private TypeHandler<?> pickSoleHandler(Map<JdbcType, TypeHandler<?>> jdbcHandlerMap) {
     TypeHandler<?> soleHandler = null;
     for (TypeHandler<?> handler : jdbcHandlerMap.values()) {
@@ -327,6 +355,7 @@ public final class TypeHandlerRegistry {
     }
     // @since 3.1.0 - try to auto-discover the mapped type
     if (!mappedTypeFound && typeHandler instanceof TypeReference) {
+      //没有使用注解的时候走这儿
       try {
         TypeReference<T> typeReference = (TypeReference<T>) typeHandler;
         register(typeReference.getRawType(), typeHandler);
@@ -347,6 +376,7 @@ public final class TypeHandlerRegistry {
   }
 
   private <T> void register(Type javaType, TypeHandler<? extends T> typeHandler) {
+    //支持MappedJdbcTypes注解,处理jdbc数据类型
     MappedJdbcTypes mappedJdbcTypes = typeHandler.getClass().getAnnotation(MappedJdbcTypes.class);
     if (mappedJdbcTypes != null) {
       for (JdbcType handledJdbcType : mappedJdbcTypes.value()) {
