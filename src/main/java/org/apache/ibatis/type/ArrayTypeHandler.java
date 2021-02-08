@@ -1,17 +1,17 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ * Copyright 2009-2019 the original author or authors.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.ibatis.type;
 
@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ArrayTypeHandler extends BaseTypeHandler<Object> {
 
   private static final ConcurrentHashMap<Class<?>, String> STANDARD_MAPPING;
+
   static {
     STANDARD_MAPPING = new ConcurrentHashMap<>();
     STANDARD_MAPPING.put(BigDecimal.class, JdbcType.NUMERIC.name());
@@ -77,20 +78,22 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object> {
 
   @Override
   public void setNonNullParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType)
-      throws SQLException {
+    throws SQLException {
     if (parameter instanceof Array) {
       // it's the user's responsibility to properly free() the Array instance
       ps.setArray(i, (Array) parameter);
     } else {
       if (!parameter.getClass().isArray()) {
         throw new TypeException(
-            "ArrayType Handler requires SQL array or java array parameter and does not support type "
-                + parameter.getClass());
+          "ArrayType Handler requires SQL array or java array parameter and does not support type "
+            + parameter.getClass());
       }
       Class<?> componentType = parameter.getClass().getComponentType();
       String arrayTypeName = resolveTypeName(componentType);
+      //通过Connection创建sql包里的Array对象
       Array array = ps.getConnection().createArrayOf(arrayTypeName, (Object[]) parameter);
       ps.setArray(i, array);
+      //array对象需要及时释放
       array.free();
     }
   }
@@ -119,6 +122,7 @@ public class ArrayTypeHandler extends BaseTypeHandler<Object> {
       return null;
     }
     Object result = array.getArray();
+    //至于为什么需要手动调用free方法,看这儿 https://github.com/mybatis/mybatis-3/issues/1427
     array.free();
     return result;
   }
