@@ -36,7 +36,7 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * A default implementation of {@link VFS} that works for most application servers.
- *
+ * 类实现中细节太多，先不纠结了，不然陷入在里面出不来了
  * @author Ben Gunter
  */
 public class DefaultVFS extends VFS {
@@ -168,6 +168,7 @@ public class DefaultVFS extends VFS {
   }
 
   /**
+   * 列出给定jar包中符合条件的资源名称
    * List the names of the entries in the given {@link JarInputStream} that begin with the
    * specified {@code path}. Entries will match with or without a leading slash.
    *
@@ -209,6 +210,7 @@ public class DefaultVFS extends VFS {
   }
 
   /**
+   * 找出指定路径上的jar包，返回jar包的准确路径
    * Attempts to deconstruct the given URL to find a JAR file containing the resource referenced
    * by the URL. That is, assuming the URL references a JAR entry, this method will return a URL
    * that references the JAR file containing the entry. If the JAR cannot be located, then this
@@ -295,6 +297,7 @@ public class DefaultVFS extends VFS {
   }
 
   /**
+   * 将jar包名称转为路径
    * Converts a Java package name to a path that can be looked up with a call to
    * {@link ClassLoader#getResources(String)}.
    *
@@ -305,6 +308,7 @@ public class DefaultVFS extends VFS {
   }
 
   /**
+   * 判断指定路径上是否是jar
    * Returns true if the resource located at the given URL is a JAR file.
    *
    * @param url The URL of the resource to test.
