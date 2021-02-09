@@ -17,6 +17,7 @@ package org.apache.ibatis.io;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,18 @@ import org.junit.jupiter.api.Test;
  * @author jasonleaster
  */
 class VFSTest {
+  @Test
+  void list(){
+    VFS vfs = VFS.getInstance();
+    try {
+      List<String> list1 = vfs.list("org.apache.ibatis.io".replace('.', '/'));
+      System.out.println(list1);
+      List<String> list = vfs.list("org.apache.ibatis.builder".replace('.', '/'));
+      System.out.println(list);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Test
   void getInstanceShouldNotBeNull() {
