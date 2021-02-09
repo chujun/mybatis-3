@@ -47,6 +47,7 @@ public class DefaultVFS extends VFS {
 
   @Override
   public boolean isValid() {
+    //永远为真,DefaultVFS兜底实现
     return true;
   }
 

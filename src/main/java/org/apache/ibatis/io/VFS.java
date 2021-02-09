@@ -35,13 +35,14 @@ import org.apache.ibatis.logging.LogFactory;
 public abstract class VFS {
   private static final Log log = LogFactory.getLog(VFS.class);
 
-  /** The built-in implementations. */
+  /** The built-in implementations.
+   * */
   public static final Class<?>[] IMPLEMENTATIONS = { JBoss6VFS.class, DefaultVFS.class };
 
   /** The list to which implementations are added by {@link #addImplClass(Class)}. */
   public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<>();
 
-  /** Singleton instance holder. */
+  /** 单例模式Singleton instance holder. */
   private static class VFSHolder {
     static final VFS INSTANCE = createVFS();
 
@@ -49,6 +50,7 @@ public abstract class VFS {
     static VFS createVFS() {
       // Try the user implementations first, then the built-ins
       List<Class<? extends VFS>> impls = new ArrayList<>();
+      //用户自定义优先级最高，DefaultVFS兜底,一定有效,保证一定存在有效的VFS
       impls.addAll(USER_IMPLEMENTATIONS);
       impls.addAll(Arrays.asList((Class<? extends VFS>[]) IMPLEMENTATIONS));
 
@@ -162,7 +164,7 @@ public abstract class VFS {
   /**
    * Get a list of {@link URL}s from the context classloader for all the resources found at the
    * specified path.
-   *
+   * TODO:cj 为什么只加载了线程上下文类加载器，而没有用其他的类加载器
    * @param path The resource path.
    * @return A list of {@link URL}s, as returned by {@link ClassLoader#getResources(String)}.
    * @throws IOException If I/O errors occur
@@ -187,6 +189,7 @@ public abstract class VFS {
   protected abstract List<String> list(URL url, String forPath) throws IOException;
 
   /**
+   * 循环遍历路径下的所有资源,包括.class文件,以及其他资源
    * Recursively list the full resource path of all the resources that are children of all the
    * resources found at the specified path.
    *
