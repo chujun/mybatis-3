@@ -131,7 +131,9 @@ public class TypeAliasRegistry {
 
   public void registerAliases(String packageName, Class<?> superType) {
     ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<>();
+    //查找指定包下并属于该superType类的Class集合
     resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
+    //获取匹配的Class集合
     Set<Class<? extends Class<?>>> typeSet = resolverUtil.getClasses();
     for (Class<?> type : typeSet) {
       // Ignore inner classes and interfaces (including package-info.java)
