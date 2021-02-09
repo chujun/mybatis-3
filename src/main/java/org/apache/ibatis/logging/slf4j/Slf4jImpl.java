@@ -33,6 +33,7 @@ public class Slf4jImpl implements Log {
     Logger logger = LoggerFactory.getLogger(clazz);
 
     if (logger instanceof LocationAwareLogger) {
+      //使用高版本实现
       try {
         // check for slf4j >= 1.6 method signature
         logger.getClass().getMethod("log", Marker.class, String.class, int.class, String.class, Object[].class, Throwable.class);
@@ -42,7 +43,7 @@ public class Slf4jImpl implements Log {
         // fail-back to Slf4jLoggerImpl
       }
     }
-
+    //使用低版本实现
     // Logger is not LocationAwareLogger or slf4j version < 1.6
     log = new Slf4jLoggerImpl(logger);
   }

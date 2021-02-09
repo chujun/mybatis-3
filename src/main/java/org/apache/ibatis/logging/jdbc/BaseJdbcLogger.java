@@ -43,12 +43,14 @@ public abstract class BaseJdbcLogger {
   protected static final Set<String> SET_METHODS;
   protected static final Set<String> EXECUTE_METHODS = new HashSet<>();
 
+  //源码可优化点:这儿有多线程并发问题
   private final Map<Object, Object> columnMap = new HashMap<>();
 
   private final List<Object> columnNames = new ArrayList<>();
   private final List<Object> columnValues = new ArrayList<>();
 
   protected final Log statementLog;
+  //TODO:cj 后续再研究,这个值是外部传入的
   protected final int queryStack;
 
   /*

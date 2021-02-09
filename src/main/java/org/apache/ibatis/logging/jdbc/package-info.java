@@ -14,6 +14,10 @@
  *    limitations under the License.
  */
 /**
+ * jdbc子包和其他子包源码逻辑完全不同。
+ * jdbc日志一般和mybatis日志是分开的，如果希望查看jdbc错误日志怎么办呢
+ *
+ * jdbc子包就是为了解决这个问题
  * Logging proxies that logs any JDBC statement.
  */
 package org.apache.ibatis.logging.jdbc;

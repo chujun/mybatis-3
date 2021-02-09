@@ -31,6 +31,7 @@ public final class LogFactory {
   private static Constructor<? extends Log> logConstructor;
 
   static {
+    //日志框架加载顺序
     tryImplementation(LogFactory::useSlf4jLogging);
     tryImplementation(LogFactory::useCommonsLogging);
     tryImplementation(LogFactory::useLog4J2Logging);
@@ -55,6 +56,9 @@ public final class LogFactory {
     }
   }
 
+  /**
+   * 也可以指定自定义logger实现，可以覆盖已有的日志实现类
+   */
   public static synchronized void useCustomLogging(Class<? extends Log> clazz) {
     setImplementation(clazz);
   }
@@ -87,7 +91,11 @@ public final class LogFactory {
     setImplementation(org.apache.ibatis.logging.nologging.NoLoggingImpl.class);
   }
 
+  /**
+   * 尝试实现一个日志示例
+   */
   private static void tryImplementation(Runnable runnable) {
+    //如果已存在，则直接返回
     if (logConstructor == null) {
       try {
         runnable.run();
@@ -99,11 +107,14 @@ public final class LogFactory {
 
   private static void setImplementation(Class<? extends Log> implClass) {
     try {
+      //当前日志实现类的构造方法
       Constructor<? extends Log> candidate = implClass.getConstructor(String.class);
+      //尝试生成日志实现类实例
       Log log = candidate.newInstance(LogFactory.class.getName());
       if (log.isDebugEnabled()) {
         log.debug("Logging initialized using '" + implClass + "' adapter.");
       }
+      //如果运行成功，说明日志实现类实例创建成功，可用，返回
       logConstructor = candidate;
     } catch (Throwable t) {
       throw new LogException("Error setting Log implementation.  Cause: " + t, t);
