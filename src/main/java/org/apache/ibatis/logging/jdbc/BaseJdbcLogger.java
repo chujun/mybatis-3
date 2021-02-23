@@ -66,7 +66,8 @@ public abstract class BaseJdbcLogger {
   }
 
   static {
-    //PreparedStatement的一些列set属性方法
+    //代理的一系列方法
+    //PreparedStatement的一系列set属性方法
     SET_METHODS = Arrays.stream(PreparedStatement.class.getDeclaredMethods())
             .filter(method -> method.getName().startsWith("set"))
             .filter(method -> method.getParameterCount() > 1)
@@ -153,13 +154,20 @@ public abstract class BaseJdbcLogger {
     }
   }
 
+  /**
+   * 输入展示,'==> ',输出展示'<== '
+   * @param isInput 是否是输入标志
+   * @return 前缀字符串
+   */
   private String prefix(boolean isInput) {
     char[] buffer = new char[queryStack * 2 + 2];
     Arrays.fill(buffer, '=');
     buffer[queryStack * 2 + 1] = ' ';
     if (isInput) {
+      //输入显示'>'字符
       buffer[queryStack * 2] = '>';
     } else {
+      //输出显示'<'字符
       buffer[0] = '<';
     }
     return new String(buffer);
