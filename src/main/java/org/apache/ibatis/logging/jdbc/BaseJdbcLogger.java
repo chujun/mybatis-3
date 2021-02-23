@@ -66,6 +66,7 @@ public abstract class BaseJdbcLogger {
   }
 
   static {
+    //PreparedStatement的一些列set属性方法
     SET_METHODS = Arrays.stream(PreparedStatement.class.getDeclaredMethods())
             .filter(method -> method.getName().startsWith("set"))
             .filter(method -> method.getParameterCount() > 1)
