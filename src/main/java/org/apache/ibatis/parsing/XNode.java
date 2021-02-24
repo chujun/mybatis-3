@@ -27,15 +27,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * 本质上是对Node对象的包装类，多提供了一个属性
  * @author Clinton Begin
  */
 public class XNode {
-
+  //表示XML文件的一个节点
   private final Node node;
+  //节点名,可以从Node中获取
   private final String name;
+  //节点体,可以从Node中获取
   private final String body;
+  //节点属性，可以从Node中获取
   private final Properties attributes;
+  //Mybatis配置文件中的properties节点属性
   private final Properties variables;
+  //XML解析器,从而具备自解析功能
   private final XPathParser xpathParser;
 
   public XNode(XPathParser xpathParser, Node node, Properties variables) {
@@ -73,6 +79,10 @@ public class XNode {
     return builder.toString();
   }
 
+  /**
+   * TODO:cj这个方法待研究，等到调用处再思考
+   * @return
+   */
   public String getValueBasedIdentifier() {
     StringBuilder builder = new StringBuilder();
     XNode current = this;
@@ -379,6 +389,7 @@ public class XNode {
     if (child.getNodeType() == Node.CDATA_SECTION_NODE
         || child.getNodeType() == Node.TEXT_NODE) {
       String data = ((CharacterData) child).getData();
+      //mybatis属性文件中的properties节点信息
       data = PropertyParser.parse(data, variables);
       return data;
     }

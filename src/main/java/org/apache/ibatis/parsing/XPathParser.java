@@ -40,15 +40,31 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
+ * 本质是对XPath的包装类，更方便使用
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
 public class XPathParser {
-
+  /**
+   * 被解析的文档对象
+   */
   private final Document document;
+  /**
+   * 是否开启验证
+   */
   private boolean validation;
+
+  /**
+   * 通过EntityResolver可以申明寻找DTD文件的方法，例如通过本地寻找，而不是只能通过网络下载DTD文件
+   */
   private EntityResolver entityResolver;
+  /**
+   * Mybatis配置文件的properties节点信息
+   */
   private Properties variables;
+  /**
+   * XPath xml文件解析工具对象
+   */
   private XPath xpath;
 
   public XPathParser(String xml) {
@@ -220,6 +236,7 @@ public class XPathParser {
 
   private Object evaluate(String expression, Object root, QName returnType) {
     try {
+      //对指定节点root运行解析语法expression，获得returnType类型的解析结果
       return xpath.evaluate(expression, root, returnType);
     } catch (Exception e) {
       throw new BuilderException("Error evaluating XPath.  Cause: " + e, e);
@@ -231,7 +248,7 @@ public class XPathParser {
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setValidating(validation);
-
+      //一系列属性设置
       factory.setNamespaceAware(false);
       factory.setIgnoringComments(true);
       factory.setIgnoringElementContentWhitespace(false);
@@ -253,6 +270,7 @@ public class XPathParser {
 
         @Override
         public void warning(SAXParseException exception) throws SAXException {
+          //也可以简单的打印日志
         }
       });
       return builder.parse(inputSource);
