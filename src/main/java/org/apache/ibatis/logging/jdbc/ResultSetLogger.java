@@ -37,10 +37,18 @@ import org.apache.ibatis.reflection.ExceptionUtil;
  *
  */
 public final class ResultSetLogger extends BaseJdbcLogger implements InvocationHandler {
-
+  /**
+   * 如果是二进制字段，则不展示字段详细信息
+   */
   private static final Set<Integer> BLOB_TYPES = new HashSet<>();
   private boolean first = true;
+  /**
+   * 记录结果集行数
+   */
   private int rows;
+  /**
+   * 被代理对象
+   */
   private final ResultSet rs;
   private final Set<Integer> blobColumns = new HashSet<>();
 
@@ -74,6 +82,7 @@ public final class ResultSetLogger extends BaseJdbcLogger implements InvocationH
             ResultSetMetaData rsmd = rs.getMetaData();
             final int columnCount = rsmd.getColumnCount();
             if (first) {
+              //打印输出列头信息
               first = false;
               printColumnHeaders(rsmd, columnCount);
             }
@@ -106,6 +115,7 @@ public final class ResultSetLogger extends BaseJdbcLogger implements InvocationH
     for (int i = 1; i <= columnCount; i++) {
       try {
         if (blobColumns.contains(i)) {
+          //二进制字段不显示字段详细内容
           row.add("<<BLOB>>");
         } else {
           row.add(rs.getString(i));

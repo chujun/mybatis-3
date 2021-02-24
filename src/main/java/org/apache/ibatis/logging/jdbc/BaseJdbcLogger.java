@@ -34,13 +34,20 @@ import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
  * Base class for proxies to do logging.
- *
+ * 都是一些公共方法
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
 public abstract class BaseJdbcLogger {
 
+  /**
+   * 被代理的方法，set方法
+   */
   protected static final Set<String> SET_METHODS;
+  /**
+   * 被代理的方法，execute方法，
+   * 源码可扩展点:支持自定义代理方法
+   */
   protected static final Set<String> EXECUTE_METHODS = new HashSet<>();
 
   //源码可优化点:这儿有多线程并发问题
