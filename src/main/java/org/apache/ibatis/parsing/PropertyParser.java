@@ -57,8 +57,11 @@ public class PropertyParser {
   }
 
   private static class VariableTokenHandler implements TokenHandler {
+    //输入的属性变量，HashTable的子类
     private final Properties variables;
+    //是否启用默认值
     private final boolean enableDefaultValue;
+    //如果启用默认值,用于表示键和默认值之间的分隔符
     private final String defaultValueSeparator;
 
     private VariableTokenHandler(Properties variables) {
@@ -71,15 +74,24 @@ public class PropertyParser {
       return (variables == null) ? defaultValue : variables.getProperty(key, defaultValue);
     }
 
+    /**
+     * 如果启用默认值，就会形如"key:defaultValue"格式
+     * 如果没有启用默认值，就会形如"key"格式
+     * @param content
+     * @return
+     */
     @Override
     public String handleToken(String content) {
       if (variables != null) {
         String key = content;
         if (enableDefaultValue) {
+          //寻找是否有默认分隔符
           final int separatorIndex = content.indexOf(defaultValueSeparator);
           String defaultValue = null;
           if (separatorIndex >= 0) {
+            //分隔符之前是键
             key = content.substring(0, separatorIndex);
+            //分隔符之后是默认值
             defaultValue = content.substring(separatorIndex + defaultValueSeparator.length());
           }
           if (defaultValue != null) {
@@ -90,6 +102,7 @@ public class PropertyParser {
           return variables.getProperty(key);
         }
       }
+      //没有发现,就原样返回
       return "${" + content + "}";
     }
   }
