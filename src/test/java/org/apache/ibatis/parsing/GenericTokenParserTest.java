@@ -39,7 +39,20 @@ class GenericTokenParserTest {
       return variables.get(content);
     }
   }
+  @Test
+  void notSupportNestToken(){
+    GenericTokenParser parser = new GenericTokenParser("${", "}", new VariableTokenHandler(new HashMap<String, String>() {
+      {
+        put("first_name", "James");
+        put("initial", "T");
+        put("last_name", "Kirk");
+        put("var{with}brace", "Hiya");
+        put("", "");
+      }
+    }));
 
+    assertEquals("null} T Kirk reporting.", parser.parse("${${aaa}} ${initial} ${last_name} reporting."));
+  }
   @Test
   void shouldDemonstrateGenericTokenReplacement() {
     GenericTokenParser parser = new GenericTokenParser("${", "}", new VariableTokenHandler(new HashMap<String, String>() {
