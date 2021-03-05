@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2018 the original author or authors.
+ *    Copyright 2009-2021 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -94,6 +94,7 @@ public class ParamNameResolver {
   }
 
   private static boolean isSpecialParameter(Class<?> clazz) {
+    //这两个特殊mybatis的类做特殊参数类处理
     return RowBounds.class.isAssignableFrom(clazz) || ResultHandler.class.isAssignableFrom(clazz);
   }
 
